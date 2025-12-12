@@ -69,7 +69,7 @@ export default function SmartPricing({ layout, theme, businessName, industry, pr
 
     const t = themes[theme] || themes.trust;
 
-    return (
+
     // --- LAYOUTS ---
 
     // 1. CENTERED (Standard 3-col grid)
