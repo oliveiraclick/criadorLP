@@ -70,7 +70,8 @@ async function Content({ searchParams }: { searchParams: Promise<SearchParams> }
             />
 
             <SmartFeatures
-                style={style}
+                layout={layout}
+                theme={theme}
                 industry={industry} // Need to make sure params has industry
                 primaryColor={primaryColor}
             />

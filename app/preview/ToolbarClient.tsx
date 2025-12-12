@@ -1,10 +1,15 @@
 "use client";
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 export default function ToolbarClient({ currentLayout, currentTheme }: { currentLayout: string, currentTheme: string }) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const [copyFeedback, setCopyFeedback] = useState('');
+    const [isExporting, setIsExporting] = useState(false);
 
     // VARIATION LOGIC
     const layouts = [
@@ -25,6 +30,73 @@ export default function ToolbarClient({ currentLayout, currentTheme }: { current
         router.push(`?${params.toString()}`);
     };
 
+    // --- SHARE LOGIC ---
+    const handleShare = () => {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            setCopyFeedback('Link Copiado!');
+            setTimeout(() => setCopyFeedback(''), 2000);
+        });
+    };
+
+    // --- EXPORT LOGIC ---
+    const handleExport = async () => {
+        setIsExporting(true);
+        try {
+            // 1. Get the current HTML content
+            // We want mainly the <main> tag.
+            const mainContent = document.querySelector('main')?.innerHTML;
+            if (!mainContent) {
+                alert('Erro ao capturar conteúdo da página.');
+                return;
+            }
+
+            // 2. Build the full HTML file
+            const fullHtml = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page Exportada</title>
+    <!-- Tailwind CSS (via CDN for simplicity in export) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Basic Reset & Font fallback */
+        body { font-family: system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body class="bg-white">
+    ${mainContent}
+    
+    <!-- Clean up UI artifacts if captured (like this toolbar if it was inside main, but it shouldn't be) -->
+    <script>
+        // Optional: Remove any elements that shouldn't be in the final page
+        document.querySelectorAll('.exclude-from-export').forEach(el => el.remove());
+    </script>
+</body>
+</html>
+            `;
+
+            // 3. Create ZIP
+            const zip = new JSZip();
+            zip.file("index.html", fullHtml);
+
+            // Add a readme
+            zip.file("README.txt", "Projeto Landing Factory\n\nEste código é uma exportação estática.\nBasta abrir o arquivo index.html em qualquer navegador.\nAs imagens base64 (logo) já estão embutidas.");
+
+            // 4. Download
+            const content = await zip.generateAsync({ type: "blob" });
+            saveAs(content, "projeto-landing-page.zip");
+
+        } catch (error) {
+            console.error(error);
+            alert('Erro ao exportar projeto.');
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
     const themes = [
         { id: 'minimal', label: 'Clean' },
         { id: 'bold', label: 'Dark / Bold' },
@@ -32,8 +104,28 @@ export default function ToolbarClient({ currentLayout, currentTheme }: { current
     ];
 
     return (
-        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md text-white p-3 rounded-2xl shadow-2xl flex flex-col gap-2 z-50 border border-white/10">
-            {/* Row 1: Layouts */}
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md text-white p-3 rounded-2xl shadow-2xl flex flex-col gap-2 z-50 border border-white/10 exclude-from-export">
+            {/* Row 1: Actions (Share/Export) */}
+            <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-1">
+                <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold px-2">Ações</span>
+                <div className="flex gap-2">
+                    <button
+                        onClick={handleShare}
+                        className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded text-xs flex items-center gap-2 transition-colors"
+                    >
+                        🔗 {copyFeedback || 'Compartilhar'}
+                    </button>
+                    <button
+                        onClick={handleExport}
+                        disabled={isExporting}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs flex items-center gap-2 transition-colors font-bold"
+                    >
+                        {isExporting ? '⏳ Gerando...' : '💾 Baixar Código (ZIP)'}
+                    </button>
+                </div>
+            </div>
+
+            {/* Row 2: Layouts */}
             <div className="flex items-center gap-2">
                 <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold px-2 w-16 text-right">Layout</span>
                 <div className="flex gap-1 bg-white/10 p-1 rounded-lg">
@@ -55,7 +147,7 @@ export default function ToolbarClient({ currentLayout, currentTheme }: { current
                 </div>
             </div>
 
-            {/* Row 2: Themes */}
+            {/* Row 3: Themes */}
             <div className="flex items-center gap-2">
                 <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold px-2 w-16 text-right">Cores</span>
                 <div className="flex gap-1 bg-white/10 p-1 rounded-lg">
@@ -71,7 +163,7 @@ export default function ToolbarClient({ currentLayout, currentTheme }: { current
                 </div>
             </div>
 
-            {/* Row 3: Background Controls */}
+            {/* Row 4: Background Controls */}
             <div className="flex items-center gap-2 border-t border-white/10 pt-2 mt-1">
                 <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold px-2 w-16 text-right">Fundo</span>
 

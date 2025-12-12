@@ -3,19 +3,75 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-outfit: 'Outfit', sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #020024;
+  color: #fff;
+  min-height: 100vh;
+  font-family: var(--font-outfit);
+}
+
+@layer utilities {
+  .bg-saas-blue {
+    background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020024 100%);
+  }
+
+  .card-white {
+    @apply bg-white text-slate-900 rounded-[2rem] shadow-xl border border-white/50;
+  }
+
+  .card-glass-blue {
+    @apply bg-blue-950/40 backdrop-blur-xl border border-white/10 rounded-[2rem] text-white;
+  }
+
+  .text-gradient-biotech {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-full transition-all hover:scale-105 active:scale-95;
+    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.5);
+  }
+
+  .shadow-glow {
+    box-shadow: 0 0 80px -20px rgba(56, 189, 248, 0.3);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020024;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+}
+
+@keyframes float-slow {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
 }
