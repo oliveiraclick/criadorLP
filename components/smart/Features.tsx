@@ -17,10 +17,20 @@ export const getDefaultFeatures = (industry: string): FeatureItem[] => {
         { id: '2', title: 'Segurança Total', desc: 'Seus dados protegidos sempre.', iconName: 'Shield' },
         { id: '3', title: 'Suporte 24/7', desc: 'Estamos sempre aqui para ajudar.', iconName: 'Headphones' },
     ];
-    if (industry.includes('Saúde')) return [
-        { id: '1', title: 'Certificação Anvisa', desc: 'Total conformidade regulatória.', iconName: 'Activity' },
-        { id: '2', title: 'Gestão de Pacientes', desc: 'Prontuários digitais integrados.', iconName: 'Users' },
-        { id: '3', title: 'Telemedicina', desc: 'Atenda de qualquer lugar.', iconName: 'Video' },
+    if (industry?.includes('health')) return [
+        { id: '1', title: 'Atendimento Humanizado', desc: 'Sua saúde e conforto em primeiro lugar.', iconName: 'Heart' },
+        { id: '2', title: 'Especialistas', desc: 'Profissionais altamente qualificados.', iconName: 'Award' },
+        { id: '3', title: 'Sorria Sem Medo', desc: 'Tecnologia avançada para o seu sorriso.', iconName: 'Smile' },
+    ];
+    if (industry?.includes('music')) return [
+        { id: '1', title: 'Som de Alta Qualidade', desc: 'Produção impecável em cada faixa.', iconName: 'Music' },
+        { id: '2', title: 'Shows e Eventos', desc: 'Confira a agenda e garanta seu lugar.', iconName: 'Mic' },
+        { id: '3', title: 'Merch Exclusivo', desc: 'Produtos oficiais para fãs de verdade.', iconName: 'ShoppingBag' },
+    ];
+    if (industry?.includes('digital')) return [
+        { id: '1', title: 'Liberdade Geográfica', desc: 'Trabalhe de onde quiser, quando quiser.', iconName: 'Globe' },
+        { id: '2', title: 'Renda Escalável', desc: 'Multiplique seus ganhos com estratégias digitais.', iconName: 'TrendingUp' },
+        { id: '3', title: 'Ferramentas Prontas', desc: 'Tudo o que você precisa para começar.', iconName: 'Laptop' }, // Using Laptop or Wifi
     ];
     return defaults;
 }

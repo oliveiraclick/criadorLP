@@ -1,17 +1,47 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import SmartHero, { TextureType, getHeroContent } from "@/components/smart/Hero";
+import SmartHero, { getHeroContent } from "@/components/smart/Hero";
+import { TextureType } from "@/components/smart/SectionBackground";
 import SmartFeatures, { getDefaultFeatures, FeatureItem } from "@/components/smart/Features";
 import SmartPricing, { getDefaultPricing, PricingPlan } from "@/components/smart/Pricing";
 import SmartFooter, { getDefaultFooter, FooterContent } from "@/components/smart/Footer";
-import ToolbarClient from "./ToolbarClient";
+
 import IconPicker from '@/components/ui/IconPicker';
+import { SmartTestimonials } from '@/components/smart/Testimonials';
+import { SmartFAQ } from '@/components/smart/FAQ';
+import { SEOSettings } from '@/components/smart/SEOSettings';
+
 import BackgroundControls from "@/components/ui/BackgroundControls";
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { useRouter } from 'next/navigation';
-import { Loader2, Download, Save, LogOut, Check, Pencil } from 'lucide-react';
+import { Loader2, Download, Save, LogOut, Check, Pencil, Palette, Smartphone, Monitor, Settings } from 'lucide-react';
+
+const INDUSTRY_PALETTES: Record<string, { color: string, name: string }[]> = {
+    'health': [
+        { color: '#0891b2', name: 'Ocean' },
+        { color: '#059669', name: 'Nature' },
+        { color: '#4f46e5', name: 'Trust' }
+    ],
+    'music': [
+        { color: '#e11d48', name: 'Passion' },
+        { color: '#9333ea', name: 'Vibe' },
+        { color: '#000000', name: 'Dark' }
+    ],
+    'digital': [
+        { color: '#7c3aed', name: 'Innovation' },
+        { color: '#2563eb', name: 'Success' },
+        { color: '#f59e0b', name: 'Energy' }
+    ],
+    'default': [
+        { color: '#2563eb', name: 'Blue' },
+        { color: '#10b981', name: 'Green' },
+        { color: '#f43f5e', name: 'Rose' },
+        { color: '#8b5cf6', name: 'Violet' },
+        { color: '#f59e0b', name: 'Amber' }
+    ]
+};
 
 type EditorProps = {
     initialParams: any;
@@ -25,6 +55,8 @@ type SectionConfig = {
     overlayOpacity: number;
     overlayColor: string;
 };
+
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
 
 // --- SECTION WRAPPER COMPONENT (Moved outside to prevent re-mounts/scroll resets) ---
 const SectionWrapper = ({
@@ -46,7 +78,7 @@ const SectionWrapper = ({
                 <>
                     <SectionToolbar
                         currentLayout={config.layout}
-                        onLayoutChange={(l) => onLayoutChange(sectionKey, l)}
+                        onLayoutChange={(l: string) => onLayoutChange(sectionKey, l)} // Fixed implicit any
                         name={title}
                         options={toolbarOptions}
                     />
@@ -62,19 +94,25 @@ const SectionWrapper = ({
                                 currentTexture={config.overlayTexture}
                                 textureOpacity={config.textureOpacity}
                                 hasBgImage={!!config.bgImage}
-                                onTextureChange={(t) => onBgChange(sectionKey, { overlayTexture: t })}
-                                onOpacityChange={(val) => onBgChange(sectionKey, { textureOpacity: val })}
-                                onImageUpload={(f) => onImageUpload(f, sectionKey)}
+                                onTextureChange={(t: any) => onBgChange(sectionKey, { overlayTexture: t })}
+                                onOpacityChange={(val: any) => onBgChange(sectionKey, { textureOpacity: val })}
+                                onImageUpload={(f: any) => onImageUpload(f, sectionKey)}
                                 onClearImage={() => onBgChange(sectionKey, { bgImage: undefined })}
                             />
                         </div>
                     )}
                 </>
             )}
-            {children}
+
+            {/* Animation Wrapper */}
+            <ScrollReveal>
+                {children}
+            </ScrollReveal>
         </div>
     );
 };
+
+// --- MAIN PAGE EDITOR ---
 
 // --- MAIN PAGE EDITOR ---
 
@@ -83,13 +121,19 @@ export default function PageEditor({ initialParams }: EditorProps) {
     const [globalConfig, setGlobalConfig] = useState({
         theme: initialParams.theme || 'trust',
         businessName: initialParams.name || 'Sua Empresa',
-        primaryColor: initialParams.color || '#2563eb',
+        primaryColor: initialParams.color || (
+            initialParams.industry === 'health' ? '#0891b2' : // Cyan-600 for Health
+                initialParams.industry === 'music' ? '#e11d48' : // Rose-600 for Music
+                    initialParams.industry === 'digital' ? '#7c3aed' : // Violet-600 for Digital
+                        '#2563eb' // Blue-600 Default
+        ),
         tone: initialParams.tone || 'Profissional & Sério',
         logo: initialParams.logo,
         industry: initialParams.industry || 'Serviços Gerais',
         bgOp: initialParams.bgOp ? parseInt(initialParams.bgOp) : 80,
         bgColor: initialParams.bgColor || '#000000',
         bgGrad: initialParams.bgGrad || 'none',
+        pageType: initialParams.type || 'sales', // New param
     });
 
     // 2. PER-SECTION CONFIG STATE
@@ -106,12 +150,14 @@ export default function PageEditor({ initialParams }: EditorProps) {
         hero: { ...initialSectionConfig },
         features: { ...initialSectionConfig, layout: 'centered', bgImage: undefined },
         pricing: { ...initialSectionConfig, layout: 'centered', bgImage: undefined },
+        testimonials: { ...initialSectionConfig, layout: 'grid', bgImage: undefined }, // NEW
+        faq: { ...initialSectionConfig, layout: 'accordion', bgImage: undefined }, // NEW
         footer: { ...initialSectionConfig, layout: 'multi_column', bgImage: undefined },
     });
 
     // 3. CONTENT STATE
     // Hero Content
-    const [heroContent, setHeroContent] = useState(() => getHeroContent(globalConfig.tone, globalConfig.businessName));
+    const [heroContent, setHeroContent] = useState(() => getHeroContent(globalConfig.tone, globalConfig.businessName, globalConfig.industry));
 
     // Features Content
     const [featureContent, setFeatureContent] = useState<FeatureItem[]>([]);
@@ -136,6 +182,9 @@ export default function PageEditor({ initialParams }: EditorProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [activeIconEdit, setActiveIconEdit] = useState<{ id: string, section: 'features' } | null>(null);
     const [activeBgControl, setActiveBgControl] = useState<string | null>(null);
+    const [showPalettePicker, setShowPalettePicker] = useState(false);
+    const [showSEO, setShowSEO] = useState(false); // NEW: SEO Modal
+    const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop'); // NEW: Mobile Toggle
     const [isSaving, setIsSaving] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const router = useRouter();
@@ -143,45 +192,65 @@ export default function PageEditor({ initialParams }: EditorProps) {
     // HANDLERS
     const handleSaveProject = async () => {
         setIsSaving(true);
+        const searchParams = new URLSearchParams(window.location.search);
+        const currentId = searchParams.get('id');
 
         // Simulate processing
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise(r => setTimeout(r, 800));
 
         // 1. Create Project Object
-        const newProject = {
-            id: Date.now(), // Simple unique ID
+        const timestamp = Date.now();
+        const projectData = {
+            id: currentId ? Number(currentId) : timestamp,
             name: globalConfig.businessName || 'Novo Projeto',
             style: globalConfig.tone || 'Moderno',
-            status: 'Rascunho',
-            date: 'Agora mesmo',
-            icon: '🚀', // Could be dynamic based on industry
-            color: 'bg-blue-600' // Could be dynamic
+            industry: globalConfig.industry,
+            lastModified: new Date().toISOString(),
+            data: {
+                global: globalConfig,
+                hero: heroContent,
+                features: featureContent,
+                pricing: pricingContent,
+                footer: footerContent
+            }
         };
 
         // 2. Save to LocalStorage
         try {
-            const stored = localStorage.getItem('my_projects');
-            const projects = stored ? JSON.parse(stored) : [];
-            localStorage.setItem('my_projects', JSON.stringify([newProject, ...projects]));
+            const existingProjectsStr = localStorage.getItem('landing_projects');
+            let projects = existingProjectsStr ? JSON.parse(existingProjectsStr) : [];
+
+            if (currentId) {
+                // UPDATE
+                projects = projects.map((p: any) => p.id === Number(currentId) ? projectData : p);
+            } else {
+                // CREATE
+                projects.push(projectData);
+                // Also update URL to prevent duplicates
+                const newParams = new URLSearchParams(window.location.search);
+                newParams.set('id', String(projectData.id));
+                router.replace(`/preview?${newParams.toString()}`);
+            }
+
+            localStorage.setItem('landing_projects', JSON.stringify(projects));
+            // Backup to 'my_projects' as well to correspond with previous logic if needed, or unify.
+            // Let's stick to 'landing_projects' as the primary source if the dashboard uses it.
+            // Just in case, update 'my_projects' too? No, let's keep it clean.
+
         } catch (e) {
-            console.error("Erro ao salvar localmente", e);
+            console.error("Erro ao salvar", e);
         }
 
         setIsSaving(false);
-        alert('Projeto salvo com sucesso! Redirecionando...');
-        router.push('/dashboard');
+        // Toast or specific UI feedback could go here
     };
 
     const handleExport = async () => {
         setIsExporting(true);
         try {
-            // Temporarily hide UI elements that shouldn't be in the export
             const uiElements = document.querySelectorAll('.exclude-from-export');
             uiElements.forEach(el => el.classList.add('hidden'));
-
             const mainContent = document.querySelector('main')?.innerHTML;
-
-            // Restore UI
             uiElements.forEach(el => el.classList.remove('hidden'));
 
             if (!mainContent) throw new Error("No content");
@@ -192,7 +261,7 @@ export default function PageEditor({ initialParams }: EditorProps) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${globalConfig.businessName} - Landing Page</title>
+    <title>${globalConfig.businessName}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>body { font-family: system-ui, sans-serif; }</style>
 </head>
@@ -203,7 +272,7 @@ export default function PageEditor({ initialParams }: EditorProps) {
 
             const zip = new JSZip();
             zip.file("index.html", fullHtml);
-            zip.file("README.txt", "Gerado por Landing Factory.\nAbra index.html para visualizar.");
+            zip.file("README.txt", "Gerado por Landing Factory.");
 
             const content = await zip.generateAsync({ type: "blob" });
             saveAs(content, `lp-${globalConfig.businessName.toLowerCase().replace(/\s+/g, '-')}.zip`);
@@ -229,28 +298,20 @@ export default function PageEditor({ initialParams }: EditorProps) {
 
     const handleImageUpload = (file: File, section: string) => {
         const reader = new FileReader();
-        reader.onloadend = () => {
-            updateSectionConfig(section, { bgImage: reader.result as string });
-        };
+        reader.onloadend = () => updateSectionConfig(section, { bgImage: reader.result as string });
         reader.readAsDataURL(file);
     };
 
-    const handleHeroContentChange = (field: string, value: string) => {
-        setHeroContent(prev => ({ ...prev, [field]: value }));
-    };
+    const handleHeroContentChange = (field: string, value: string) => setHeroContent(prev => ({ ...prev, [field]: value }));
 
     const handleFeatureEdit = (id: string, field: 'title' | 'desc' | 'icon', newValue?: string) => {
         if (!isEditing) return;
         if (field === 'icon') { setActiveIconEdit({ id, section: 'features' }); return; }
-
-        if (newValue !== undefined) {
-            setFeatureContent(prev => prev.map(item => item.id === id ? { ...item, [field]: newValue } : item));
-        }
+        if (newValue !== undefined) setFeatureContent(prev => prev.map(item => item.id === id ? { ...item, [field]: newValue } : item));
     };
 
     const handlePricingEdit = (id: string, field: 'name' | 'price' | 'features', value: any, featureIndex?: number) => {
         if (!isEditing) return;
-
         setPricingContent(prev => prev.map(item => {
             if (item.id !== id) return item;
             if (field === 'features' && featureIndex !== undefined) {
@@ -264,19 +325,13 @@ export default function PageEditor({ initialParams }: EditorProps) {
 
     const handleFooterEdit = (field: string, value: any, sectionId?: string, itemIndex?: number) => {
         if (!isEditing) return;
-
         if (field === 'sectionTitle' && sectionId) {
-            setFooterContent(prev => ({
-                ...prev,
-                sections: prev.sections.map(s => s.id === sectionId ? { ...s, title: value } : s)
-            }));
+            setFooterContent(prev => ({ ...prev, sections: prev.sections.map(s => s.id === sectionId ? { ...s, title: value } : s) }));
             return;
         }
-
         if (field === 'sectionItem' && sectionId && itemIndex !== undefined) {
             setFooterContent(prev => ({
-                ...prev,
-                sections: prev.sections.map(s => {
+                ...prev, sections: prev.sections.map(s => {
                     if (s.id !== sectionId) return s;
                     const newItems = [...s.items];
                     newItems[itemIndex] = value;
@@ -285,7 +340,6 @@ export default function PageEditor({ initialParams }: EditorProps) {
             }));
             return;
         }
-
         setFooterContent(prev => ({ ...prev, [field]: value }));
     };
 
@@ -298,179 +352,205 @@ export default function PageEditor({ initialParams }: EditorProps) {
 
 
     return (
-        <div className="min-h-screen bg-white relative">
+        <div className="min-h-screen bg-slate-50 relative overflow-x-hidden">
             {activeIconEdit && <IconPicker currentIcon="" onSelect={handleIconSelect} onClose={() => setActiveIconEdit(null)} />}
 
-            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 p-2 bg-slate-900/90 backdrop-blur rounded-full shadow-2xl border border-slate-700/50 exclude-from-export transition-all hover:scale-105">
+            {/* FLOATING TOOLBAR */}
+            <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 p-2 bg-slate-900/90 backdrop-blur-md rounded-full shadow-2xl border border-slate-700/50 exclude-from-export transition-all hover:scale-105 ring-1 ring-white/10">
+
+                {/* SEO Settings */}
                 <button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className={`px-4 py-2 rounded-full font-bold text-sm transition-all flex items-center gap-2 ${isEditing ? 'bg-green-500 text-white shadow-lg' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
+                    onClick={() => setShowSEO(true)}
+                    className="p-2.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-all mx-1"
+                    title="Configurações SEO"
                 >
-                    {isEditing ? <Check size={16} /> : <Pencil size={16} />}
-                    {isEditing ? 'Concluir Edição' : 'Editar Página'}
+                    <Settings size={20} />
                 </button>
 
-                <div className="w-[1px] h-6 bg-slate-700 mx-1"></div>
+                <div className="w-[1px] h-6 bg-slate-700"></div>
+
+                {/* Device Toggles */}
+                <div className="flex bg-slate-800 rounded-full p-1 mx-2 border border-slate-700">
+                    <button
+                        onClick={() => setDeviceMode('desktop')}
+                        className={`p-2 rounded-full transition-all ${deviceMode === 'desktop' ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                        title="Desktop"
+                    >
+                        <Monitor size={18} />
+                    </button>
+                    <button
+                        onClick={() => setDeviceMode('mobile')}
+                        className={`p-2 rounded-full transition-all ${deviceMode === 'mobile' ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                        title="Mobile"
+                    >
+                        <Smartphone size={18} />
+                    </button>
+                </div>
+
+                <div className="w-[1px] h-6 bg-slate-700"></div>
+
+                <button
+                    onClick={() => setIsEditing(!isEditing)}
+                    className={`px-5 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2 ${isEditing ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
+                >
+                    {isEditing ? <Check size={18} strokeWidth={3} /> : <Pencil size={18} />}
+                    {isEditing ? 'Pronto' : 'Editar'}
+                </button>
+
+                {isEditing && (
+                    <div className="relative animate-fade-in-right">
+                        <button
+                            onClick={() => setShowPalettePicker(!showPalettePicker)}
+                            className="px-4 py-2 rounded-full font-bold text-sm bg-slate-800 text-white hover:bg-slate-700 flex items-center gap-2 transition-all border-l border-slate-700 ml-2"
+                        >
+                            <Palette size={18} style={{ color: globalConfig.primaryColor }} />
+                        </button>
+
+                        {showPalettePicker && (
+                            <div className="absolute top-14 left-0 bg-white p-2 rounded-2xl shadow-xl border border-slate-100 min-w-[220px] flex flex-col gap-1 animate-fade-in-up origin-top-left">
+                                <span className="text-xs font-bold text-slate-400 px-3 py-2 uppercase tracking-wider">Cores Sugeridas</span>
+                                {(INDUSTRY_PALETTES[globalConfig.industry as keyof typeof INDUSTRY_PALETTES] || INDUSTRY_PALETTES['default']).map((p) => (
+                                    <button
+                                        key={p.color}
+                                        onClick={() => {
+                                            setGlobalConfig(prev => ({ ...prev, primaryColor: p.color }));
+                                            setShowPalettePicker(false);
+                                        }}
+                                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-left transition-colors group"
+                                    >
+                                        <div className="w-8 h-8 rounded-full shadow-sm border border-slate-100 group-hover:scale-110 transition-transform" style={{ backgroundColor: p.color }}></div>
+                                        <div>
+                                            <span className={`text-sm font-bold block ${globalConfig.primaryColor === p.color ? 'text-slate-900' : 'text-slate-600'}`}>{p.name}</span>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                <div className="w-[1px] h-6 bg-slate-700 mx-2"></div>
 
                 <button
                     onClick={handleExport}
                     disabled={isExporting}
-                    className="px-4 py-2 rounded-full font-bold text-sm bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
+                    className="p-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]"
+                    title="Baixar Site (ZIP)"
                 >
-                    {isExporting ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
-                    <span className="hidden md:inline">Baixar ZIP</span>
+                    {isExporting ? <Loader2 className="animate-spin" size={20} /> : <Download size={20} />}
                 </button>
 
                 <button
                     onClick={handleSaveProject}
                     disabled={isSaving}
-                    className="px-4 py-2 rounded-full font-bold text-sm bg-slate-800 text-white hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all border border-slate-700"
-                    title="Salvar e Voltar"
+                    className="p-2.5 rounded-full bg-slate-800 text-white hover:bg-slate-700 disabled:opacity-50 flex items-center gap-2 transition-all border border-slate-700 ml-2"
+                    title="Salvar Projeto"
                 >
-                    {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                    <span className="hidden md:inline">Salvar</span>
+                    {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
                 </button>
             </div>
 
-            <main className={isEditing ? 'ring-4 ring-offset-4 ring-blue-500/20' : ''}>
+            {/* MAIN PREVIEW AREA */}
+            <main className={`transition-all duration-700 ease-in-out origin-top ${isEditing ? 'scale-[0.98] mt-24 mb-24 rounded-[2rem] shadow-2xl ring-1 ring-slate-900/5' : ''
+                } ${deviceMode === 'mobile'
+                    ? 'max-w-[400px] mx-auto border-[14px] border-slate-900 rounded-[3rem] overflow-hidden my-24 shadow-2xl bg-white'
+                    : 'w-full'
+                }`}>
 
+                {/* 1. HERO SECTION */}
                 <SectionWrapper
-                    sectionKey="hero"
-                    title="Hero Section"
-                    isEditing={isEditing}
-                    config={sectionConfigs.hero}
-                    activeBgControl={activeBgControl}
-                    onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })}
-                    onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)}
-                    onBgChange={handleBgChange}
-                    onImageUpload={handleImageUpload}
+                    sectionKey="hero" title="Hero / Capa" isEditing={isEditing} config={sectionConfigs.hero} activeBgControl={activeBgControl}
+                    onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
                     toolbarOptions={[
-                        { id: 'split_right', label: 'Clássico 1' },
-                        { id: 'classic_card', label: 'Clássico 2' },
-                        { id: 'classic_centered', label: 'Clássico 3' },
-                        { id: 'impact_full', label: 'Moderno 1' },
-                        { id: 'impact_big_type', label: 'Moderno 2' },
-                        { id: 'minimal_centered', label: 'Minimalista' }
+                        { id: 'split_right', label: 'Clássico' },
+                        { id: 'impact_full', label: 'Impacto' },
+                        { id: 'minimal_centered', label: 'Minimalista' },
+                        { id: 'artistic_intense', label: 'Artista / Intenso' }
                     ]}
                 >
                     <SmartHero
-                        layout={sectionConfigs.hero.layout as any}
-                        theme={globalConfig.theme as any}
-                        businessName={globalConfig.businessName}
-                        primaryColor={globalConfig.primaryColor}
-                        tone={globalConfig.tone}
-                        logo={globalConfig.logo}
-                        // Content State
-                        content={heroContent}
-                        isEditing={isEditing}
-                        onContentChange={handleHeroContentChange}
-                        // BG Props
-                        backgroundImage={sectionConfigs.hero.bgImage}
-                        overlayTexture={sectionConfigs.hero.overlayTexture}
-                        textureOpacity={sectionConfigs.hero.textureOpacity}
-                        overlayOpacity={sectionConfigs.hero.overlayOpacity}
-                        overlayColor={sectionConfigs.hero.overlayColor}
-                        overlayGradient={globalConfig.bgGrad as any}
+                        layout={sectionConfigs.hero.layout as any} theme={globalConfig.theme as any} businessName={globalConfig.businessName} industry={globalConfig.industry} primaryColor={globalConfig.primaryColor} tone={globalConfig.tone} logo={globalConfig.logo}
+                        content={heroContent} isEditing={isEditing} onContentChange={handleHeroContentChange}
+                        backgroundImage={sectionConfigs.hero.bgImage} overlayTexture={sectionConfigs.hero.overlayTexture} textureOpacity={sectionConfigs.hero.textureOpacity} overlayOpacity={sectionConfigs.hero.overlayOpacity} overlayColor={sectionConfigs.hero.overlayColor} overlayGradient={globalConfig.bgGrad as any}
                     />
                 </SectionWrapper>
 
+                {/* 2. FEATURES SECTION */}
                 <SectionWrapper
-                    sectionKey="features" title="Features"
-                    isEditing={isEditing} config={sectionConfigs.features} activeBgControl={activeBgControl}
-                    onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })}
-                    onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)}
-                    onBgChange={handleBgChange} onImageUpload={handleImageUpload}
-                    toolbarOptions={[
-                        { id: 'centered', label: 'Grid Central' },
-                        { id: 'split_right', label: 'Lista Direita' },
-                        { id: 'full_left', label: 'Lista Esquerda' }
-                    ]}
+                    sectionKey="features" title="Benefícios" isEditing={isEditing} config={sectionConfigs.features} activeBgControl={activeBgControl}
+                    onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                    toolbarOptions={[{ id: 'centered', label: 'Grid' }, { id: 'split_right', label: 'Lista' }]}
                 >
                     <SmartFeatures
-                        layout={sectionConfigs.features.layout as any}
-                        theme={globalConfig.theme as any}
-                        content={featureContent}
-                        primaryColor={globalConfig.primaryColor}
-                        isEditing={isEditing}
-                        onItemEdit={handleFeatureEdit}
-                        // BG Props
-                        backgroundImage={sectionConfigs.features.bgImage}
-                        overlayTexture={sectionConfigs.features.overlayTexture}
-                        textureOpacity={sectionConfigs.features.textureOpacity}
-                        overlayOpacity={sectionConfigs.features.overlayOpacity}
-                        overlayColor={sectionConfigs.features.overlayColor}
-                        overlayGradient={globalConfig.bgGrad as any}
+                        layout={sectionConfigs.features.layout as any} theme={globalConfig.theme as any} content={featureContent} primaryColor={globalConfig.primaryColor} isEditing={isEditing} onItemEdit={handleFeatureEdit}
+                        backgroundImage={sectionConfigs.features.bgImage} overlayTexture={sectionConfigs.features.overlayTexture} textureOpacity={sectionConfigs.features.textureOpacity} overlayOpacity={sectionConfigs.features.overlayOpacity} overlayColor={sectionConfigs.features.overlayColor} overlayGradient={globalConfig.bgGrad as any}
                     />
                 </SectionWrapper>
 
+                {/* 3. TESTIMONIALS SECTION (NEW) */}
                 <SectionWrapper
-                    sectionKey="pricing" title="Pricing"
-                    isEditing={isEditing} config={sectionConfigs.pricing} activeBgControl={activeBgControl}
-                    onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })}
-                    onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)}
-                    onBgChange={handleBgChange} onImageUpload={handleImageUpload}
-                    toolbarOptions={[
-                        { id: 'centered', label: 'Cards (Padrão)' },
-                        { id: 'list', label: 'Lista Horizontal' },
-                        { id: 'minimal_cards', label: 'Cards Minimal' }
-                    ]}
+                    sectionKey="testimonials" title="Prova Social" isEditing={isEditing} config={sectionConfigs.testimonials} activeBgControl={activeBgControl}
+                    onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                    toolbarOptions={[{ id: 'grid', label: 'Grid' }]}
                 >
-                    <SmartPricing
-                        layout={sectionConfigs.pricing.layout as any}
-                        theme={globalConfig.theme as any}
-                        businessName={globalConfig.businessName}
+                    <SmartTestimonials
                         industry={globalConfig.industry}
                         primaryColor={globalConfig.primaryColor}
-                        // Content State (NEW)
-                        content={pricingContent}
                         isEditing={isEditing}
-                        onPlanEdit={handlePricingEdit}
-                        // BG Props
-                        backgroundImage={sectionConfigs.pricing.bgImage}
-                        overlayTexture={sectionConfigs.pricing.overlayTexture}
-                        textureOpacity={sectionConfigs.pricing.textureOpacity}
-                        overlayOpacity={sectionConfigs.pricing.overlayOpacity}
-                        overlayColor={sectionConfigs.pricing.overlayColor}
-                        overlayGradient={globalConfig.bgGrad as any}
                     />
                 </SectionWrapper>
 
+                {/* 4. PRICING SECTION */}
+                {globalConfig.pageType === 'sales' && (
+                    <SectionWrapper
+                        sectionKey="pricing" title="Preços" isEditing={isEditing} config={sectionConfigs.pricing} activeBgControl={activeBgControl}
+                        onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                        toolbarOptions={[{ id: 'centered', label: 'Cards' }, { id: 'list', label: 'Lista' }]}
+                    >
+                        <SmartPricing
+                            layout={sectionConfigs.pricing.layout as any} theme={globalConfig.theme as any} businessName={globalConfig.businessName} industry={globalConfig.industry} primaryColor={globalConfig.primaryColor}
+                            content={pricingContent} isEditing={isEditing} onPlanEdit={handlePricingEdit}
+                            backgroundImage={sectionConfigs.pricing.bgImage} overlayTexture={sectionConfigs.pricing.overlayTexture} textureOpacity={sectionConfigs.pricing.textureOpacity} overlayOpacity={sectionConfigs.pricing.overlayOpacity} overlayColor={sectionConfigs.pricing.overlayColor} overlayGradient={globalConfig.bgGrad as any}
+                        />
+                    </SectionWrapper>
+                )}
+
+                {/* 5. FAQ SECTION (NEW) */}
                 <SectionWrapper
-                    sectionKey="footer" title="Footer"
-                    isEditing={isEditing} config={sectionConfigs.footer} activeBgControl={activeBgControl}
-                    onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })}
-                    onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)}
-                    onBgChange={handleBgChange} onImageUpload={handleImageUpload}
-                    toolbarOptions={[
-                        { id: 'multi_column', label: 'Multi Colunas' },
-                        { id: 'simple_centered', label: 'Simples Centro' },
-                        { id: 'newsletter_impact', label: 'Newsletter' },
-                        { id: 'minimal', label: 'Minimalista' }
-                    ]}
+                    sectionKey="faq" title="FAQ" isEditing={isEditing} config={sectionConfigs.faq} activeBgControl={activeBgControl}
+                    onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                    toolbarOptions={[{ id: 'accordion', label: 'Acordeão' }]}
+                >
+                    <SmartFAQ
+                        industry={globalConfig.industry}
+                        primaryColor={globalConfig.primaryColor}
+                        isEditing={isEditing}
+                    />
+                </SectionWrapper>
+
+                {/* 6. FOOTER */}
+                <SectionWrapper
+                    sectionKey="footer" title="Rodapé" isEditing={isEditing} config={sectionConfigs.footer} activeBgControl={activeBgControl}
+                    onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                    toolbarOptions={[{ id: 'multi_column', label: 'Completo' }, { id: 'simple_centered', label: 'Simples' }]}
                 >
                     <SmartFooter
-                        layout={sectionConfigs.footer.layout as any}
-                        theme={globalConfig.theme as any}
-                        businessName={globalConfig.businessName}
-                        primaryColor={globalConfig.primaryColor}
-                        logo={globalConfig.logo}
-                        // Content State (NEW)
-                        content={footerContent}
-                        isEditing={isEditing}
-                        onContentChange={handleFooterEdit}
-                        // BG Props
-                        backgroundImage={sectionConfigs.footer.bgImage}
-                        overlayTexture={sectionConfigs.footer.overlayTexture}
-                        textureOpacity={sectionConfigs.footer.textureOpacity}
-                        overlayOpacity={sectionConfigs.footer.overlayOpacity}
-                        overlayColor={sectionConfigs.footer.overlayColor}
-                        overlayGradient={globalConfig.bgGrad as any}
+                        layout={sectionConfigs.footer.layout as any} theme={globalConfig.theme as any} businessName={globalConfig.businessName} primaryColor={globalConfig.primaryColor} logo={globalConfig.logo}
+                        content={footerContent} isEditing={isEditing} onContentChange={handleFooterEdit}
+                        backgroundImage={sectionConfigs.footer.bgImage} overlayTexture={sectionConfigs.footer.overlayTexture} textureOpacity={sectionConfigs.footer.textureOpacity} overlayOpacity={sectionConfigs.footer.overlayOpacity} overlayColor={sectionConfigs.footer.overlayColor} overlayGradient={globalConfig.bgGrad as any}
                     />
                 </SectionWrapper>
 
             </main>
 
-            {!isEditing && <ToolbarClient currentLayout={globalConfig.theme} currentTheme={globalConfig.theme} />}
+            {/* MODALS */}
+            {showSEO && (
+                <SEOSettings
+                    businessName={globalConfig.businessName}
+                    industry={globalConfig.industry}
+                    onClose={() => setShowSEO(false)}
+                />
+            )}
         </div>
     );
 }

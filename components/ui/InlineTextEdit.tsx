@@ -52,8 +52,8 @@ export default function InlineTextEdit({
                     value={tempValue}
                     onChange={(e) => setTempValue(e.target.value)}
                     onBlur={handleBlur}
-                    className={`bg-white/10 backdrop-blur border-2 border-blue-500 rounded p-1 outline-none w-full min-h-[100px] resize-y ${className}`}
-                    style={{ color: 'inherit', fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 'inherit' }}
+                    className={`bg-white/90 backdrop-blur border-2 border-blue-500 rounded p-1 outline-none w-full min-h-[100px] resize-y text-slate-900 shadow-xl z-50 relative ${className}`}
+                    style={{ fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 'inherit' }}
                 />
             );
         }
@@ -64,8 +64,8 @@ export default function InlineTextEdit({
                 onChange={(e) => setTempValue(e.target.value)}
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
-                className={`bg-white/10 backdrop-blur border-2 border-blue-500 rounded p-1 outline-none w-full ${className}`}
-                style={{ color: 'inherit', fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 'inherit' }}
+                className={`bg-white/90 backdrop-blur border-2 border-blue-500 rounded p-1 outline-none w-full text-slate-900 shadow-xl z-50 relative ${className}`}
+                style={{ fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 'inherit' }}
             />
         );
     }

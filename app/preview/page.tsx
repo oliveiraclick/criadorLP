@@ -60,34 +60,4 @@ function Banner() {
     )
 }
 
-function RegenerationToolbar({ currentLayout, currentTheme }: { currentLayout: string, currentTheme: string }) {
 
-    const layouts = [
-        { id: 'centered', label: 'Centralizado' },
-        { id: 'full_left', label: 'Impacto Visual' },
-        { id: 'split_right', label: 'Clássico / Split' }
-    ];
-
-    const themes = [
-        { id: 'minimal', label: 'Clean' },
-        { id: 'bold', label: 'Dark / Bold' },
-        { id: 'trust', label: 'Profissional' }
-    ];
-
-    // Helper to build URL (in a real app, use useSearchParams + useRouter)
-    // Here we just append all current params + new one. 
-    // Since this is server rendered, we can just use simple hrefs with URLSearchParams in a client component, 
-    // but here we are in a server component (or mixed). 
-    // Let's assume we want to preserve other params. 
-    // For this prototype, a simple way is using a client component for the toolbar or just simple JS.
-    // Given the constraints, let's make the toolbar buttons update the URL.
-
-    // We need to know current params to preserve them. 
-    // Since we don't have them easily here without drilling, let's just make it a Client Component 
-    // or use a simple script. 
-    // Actually, making it a client component is best.
-
-    return <ToolbarClient currentLayout={currentLayout} currentTheme={currentTheme} />
-}
-
-import ToolbarClient from "./ToolbarClient";

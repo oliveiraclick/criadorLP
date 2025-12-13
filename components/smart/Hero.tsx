@@ -6,7 +6,7 @@ import InlineTextEdit from '../ui/InlineTextEdit';
 type HeroLayout =
     | 'classic_split' | 'classic_card' | 'classic_centered'
     | 'impact_full' | 'impact_big_type'
-    | 'centered' | 'full_left' | 'split_right' | 'split_left' | 'minimal_centered';
+    | 'centered' | 'full_left' | 'split_right' | 'split_left' | 'minimal_centered' | 'artistic_intense';
 
 type HeroContent = {
     headline: string;
@@ -18,6 +18,7 @@ type HeroProps = {
     layout: HeroLayout;
     theme: 'minimal' | 'bold' | 'trust';
     businessName: string;
+    industry?: string; // NEW
     primaryColor: string;
     tone: string;
     logo?: string;
@@ -37,7 +38,30 @@ type HeroProps = {
 };
 
 // ... (getHeroContent and getHeroConfig unchanged helper functions) ...
-export const getHeroContent = (tone: string, businessName: string): HeroContent => {
+export const getHeroContent = (tone: string, businessName: string, industry?: string): HeroContent => {
+    // 1. Industry Specific Defaults
+    if (industry === 'music') return {
+        headline: `Novo Som: ${businessName}`,
+        subheadline: "Disponível em todas as plataformas digitais. Sinta a vibe e conecte-se com a música.",
+        cta: "Ouvir Agora"
+    };
+    if (industry === 'health') return {
+        headline: `${businessName}: Sua Saúde em Primeiro Lugar`,
+        subheadline: "Atendimento humanizado e especialistas dedicados ao seu bem-estar e qualidade de vida.",
+        cta: "Agendar Consulta"
+    };
+    if (industry === 'digital') return {
+        headline: "Liberdade para Vender Online",
+        subheadline: "Transforme seu home office em uma máquina de vendas com nossas estratégias digitais.",
+        cta: "Começar Agora"
+    };
+    if (industry === 'services') return {
+        headline: `Soluções Ágeis para Você`,
+        subheadline: "Serviços de qualidade no conforto da sua casa. Solicite um orçamento sem compromisso.",
+        cta: "Pedir Orçamento"
+    };
+
+    // 2. Tone Fallbacks
     if (tone.includes('Criativo')) return {
         headline: `Inovação e Design para ${businessName}`,
         subheadline: "Transformamos suas ideias em experiências digitais memoráveis e únicas.",
@@ -81,7 +105,7 @@ export default function SmartHero({
 
     // If no external content state provided, generate defaults on fly (read-only mode essentially)
     // In PageEditor we will pass the state so it persists.
-    const defaultContent = getHeroContent(tone, businessName);
+    const defaultContent = getHeroContent(tone, businessName, props.industry);
     const content = externalContent || defaultContent;
 
     // ... Themes (unchanged) ...
@@ -202,17 +226,60 @@ export default function SmartHero({
         );
     }
 
-    if (layout === 'full_left' || layout === 'impact_full') {
+    if (layout === 'artistic_intense') {
+        const bg = backgroundImage ? `url(${backgroundImage})` : 'none';
         return (
-            <section className={containerClass}>
-                <SectionBackground backgroundImage={backgroundImage} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} overlayTexture={overlayTexture} textureOpacity={textureOpacity} theme={theme} />
-                <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                    <div className="text-left">
-                        {logo && <img src={logo} alt="Logo" className="h-12 mb-8" />}
-                        <InlineTextEdit value={content.headline} onChange={(v) => onContentChange?.('headline', v)} isEditing={isEditing} tagName="h1" className={`text-5xl md:text-7xl mb-8 leading-tight ${titleClass}`} />
-                        <InlineTextEdit value={content.subheadline} onChange={(v) => onContentChange?.('subheadline', v)} isEditing={isEditing} tagName="p" multiline className={`text-lg mb-8 max-w-md ${subClass}`} />
-                        <button className={`px-10 py-5 text-xl rounded-lg font-bold transition-transform hover:scale-105 ${t.button}`} style={{ backgroundColor: primaryColor }}>
+            <section className="relative min-h-screen flex items-end justify-center py-24 px-4 overflow-hidden bg-black text-white">
+                {/* Background Layer with Zoom Effect */}
+                <div className="absolute inset-0 z-0 select-none pointer-events-none">
+                    {backgroundImage ? (
+                        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80 scale-105" style={{ backgroundImage: bg }}></div>
+                    ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-black to-slate-900 opacity-100"></div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                </div>
+
+                <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center text-center">
+                    {/* Floating Tag */}
+                    <div className="animate-bounce mb-8">
+                        <span className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-2 rounded-full text-xs font-bold uppercase tracking-[0.3em]">
+                            Novo Lançamento
+                        </span>
+                    </div>
+
+                    {/* Massive Typography */}
+                    <div className="relative mb-8 group">
+                        <InlineTextEdit
+                            value={content.headline}
+                            onChange={(v) => onContentChange?.('headline', v)}
+                            isEditing={isEditing}
+                            tagName="h1"
+                            className="text-7xl md:text-[9rem] hover:scale-105 transition-transform duration-700 font-black uppercase leading-[0.8] tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60 drop-shadow-2xl"
+                        />
+                        {/* Glitch Shadow Effect */}
+                        <h1 className="absolute top-1 left-1 w-full text-7xl md:text-[9rem] font-black uppercase leading-[0.8] tracking-tighter text-red-500/0 group-hover:text-red-500/30 -z-10 transition-all duration-300 select-none">
+                            {content.headline}
+                        </h1>
+                    </div>
+
+                    <InlineTextEdit
+                        value={content.subheadline}
+                        onChange={(v) => onContentChange?.('subheadline', v)}
+                        isEditing={isEditing}
+                        tagName="p"
+                        multiline
+                        className="text-lg md:text-2xl text-neutral-300 font-light tracking-wide max-w-2xl mb-12 mix-blend-plus-lighter"
+                    />
+
+                    {/* Action Bar */}
+                    <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md">
+                        <button className="flex-1 bg-white text-black h-14 rounded-full font-bold uppercase tracking-widest hover:bg-neutral-200 transition-colors shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)]">
                             <InlineTextEdit value={content.cta} onChange={(v) => onContentChange?.('cta', v)} isEditing={isEditing} tagName="span" />
+                        </button>
+                        <button className="flex-1 border border-white/30 text-white h-14 rounded-full font-bold uppercase tracking-widest hover:bg-white/10 backdrop-blur-sm transition-all">
+                            Ver Tour
                         </button>
                     </div>
                 </div>
