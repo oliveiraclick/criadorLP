@@ -1,4 +1,5 @@
-import { LucideIcon, icons } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+import { LucideIcon, Settings } from 'lucide-react';
 import React from 'react';
 import IconPicker from '../ui/IconPicker';
 import SectionBackground, { TextureType } from './SectionBackground';
@@ -92,7 +93,7 @@ export default function SmartFeatures({
 
     // Helper functions
     const renderIcon = (name: string, id: string) => {
-        const Icon = (icons as any)[name] || icons.HelpCircle;
+        const Icon = (LucideIcons as any)[name] || Settings;
         return (
             <EditWrapper isEditing={isEditing} onClick={() => onItemEdit?.(id, 'icon')} className={`w-12 h-12 rounded-lg ${t.iconBg} flex items-center justify-center mb-4 text-blue-600`}>
                 <Icon size={24} style={{ color: primaryColor }} />

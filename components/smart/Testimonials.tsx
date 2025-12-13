@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Star, User, Quote } from 'lucide-react';
-import { InlineTextEdit } from '@/components/ui/InlineTextEdit';
-import { SectionBackground } from './SectionBackground';
+import InlineTextEdit from '@/components/ui/InlineTextEdit';
+import SectionBackground from './SectionBackground';
 
 interface Testimonial {
     id: string;
