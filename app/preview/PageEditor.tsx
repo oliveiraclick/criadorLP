@@ -479,7 +479,7 @@ export default function PageEditor({ initialParams }: EditorProps) {
                 <SectionWrapper
                     sectionKey="features" title="Benefícios" isEditing={isEditing} config={sectionConfigs.features} activeBgControl={activeBgControl}
                     onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
-                    toolbarOptions={[{ id: 'centered', label: 'Grid' }, { id: 'split_right', label: 'Lista' }]}
+                    toolbarOptions={[{ id: 'centered', label: 'Grid' }, { id: 'split_right', label: 'Lista' }, { id: 'full_left', label: 'Impacto' }]}
                 >
                     <SmartFeatures
                         layout={sectionConfigs.features.layout as any} theme={globalConfig.theme as any} content={featureContent} primaryColor={globalConfig.primaryColor} isEditing={isEditing} onItemEdit={handleFeatureEdit}
@@ -505,7 +505,7 @@ export default function PageEditor({ initialParams }: EditorProps) {
                     <SectionWrapper
                         sectionKey="pricing" title="Preços" isEditing={isEditing} config={sectionConfigs.pricing} activeBgControl={activeBgControl}
                         onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
-                        toolbarOptions={[{ id: 'centered', label: 'Cards' }, { id: 'list', label: 'Lista' }]}
+                        toolbarOptions={[{ id: 'centered', label: 'Cards' }, { id: 'list', label: 'Lista' }, { id: 'minimal_cards', label: 'Minimalista' }]}
                     >
                         <SmartPricing
                             layout={sectionConfigs.pricing.layout as any} theme={globalConfig.theme as any} businessName={globalConfig.businessName} industry={globalConfig.industry} primaryColor={globalConfig.primaryColor}
@@ -532,7 +532,7 @@ export default function PageEditor({ initialParams }: EditorProps) {
                 <SectionWrapper
                     sectionKey="footer" title="Rodapé" isEditing={isEditing} config={sectionConfigs.footer} activeBgControl={activeBgControl}
                     onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
-                    toolbarOptions={[{ id: 'multi_column', label: 'Completo' }, { id: 'simple_centered', label: 'Simples' }]}
+                    toolbarOptions={[{ id: 'multi_column', label: 'Completo' }, { id: 'simple_centered', label: 'Simples' }, { id: 'newsletter_impact', label: 'Newsletter' }]}
                 >
                     <SmartFooter
                         layout={sectionConfigs.footer.layout as any} theme={globalConfig.theme as any} businessName={globalConfig.businessName} primaryColor={globalConfig.primaryColor} logo={globalConfig.logo}
@@ -570,7 +570,7 @@ function SectionToolbar({ currentLayout, onLayoutChange, name, options }: { curr
             <div className="h-4 w-[1px] bg-white/20"></div>
             <div className="flex gap-1 overflow-x-auto scrollbar-hide">
                 {displayOptions.map(l => (
-                    <button key={l.id} onClick={() => onLayoutChange(l.id)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${currentLayout === l.id ? 'bg-white text-black' : 'hover:bg-white/20 text-slate-300'}`}>
+                    <button type="button" key={l.id} onClick={() => onLayoutChange(l.id)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${currentLayout === l.id ? 'bg-white text-black' : 'hover:bg-white/20 text-slate-300'}`}>
                         {l.label}
                     </button>
                 ))}
