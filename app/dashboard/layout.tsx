@@ -11,7 +11,7 @@ export default function DashboardLayout({
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-900/10 rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative z-10 px-6 py-8 md:px-12 max-w-7xl mx-auto">
+      <div className="relative z-10 px-4 py-4 md:px-12 max-w-7xl mx-auto">
         {children}
       </div>
     </div>

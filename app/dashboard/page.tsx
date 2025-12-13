@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Trash2, Plus, Layout, Zap, Search } from 'lucide-react';
 
 type Project = {
@@ -36,9 +36,41 @@ export default function DashboardPage() {
         }
     ]);
 
+    // Load from LocalStorage on Mount
+    useEffect(() => {
+        const stored = localStorage.getItem('my_projects');
+        if (stored) {
+            try {
+                const localProjects = JSON.parse(stored);
+                setProjects(prev => {
+                    // Avoid duplicates if strict mode runs twice, filter by ID if needed, 
+                    // but for now just combining distinct ones or simply prepending new ones.
+                    // Let's just prepend unique IDs
+                    const existingIds = new Set(prev.map(p => p.id));
+                    const uniqueLocal = localProjects.filter((p: Project) => !existingIds.has(p.id));
+                    return [...uniqueLocal, ...prev];
+                });
+            } catch (e) {
+                console.error("Erro ao carregar projetos", e);
+            }
+        }
+    }, []);
+
     const handleDelete = (id: number, name: string) => {
         if (window.confirm(`Excluir "${name}"?`)) {
-            setProjects(prev => prev.filter(p => p.id !== id));
+            setProjects(prev => {
+                const updated = prev.filter(p => p.id !== id);
+                // Update LocalStorage to keep sync
+                // We only remove from local storage if it was there. 
+                // Simplest is to filter the 'stored' one.
+                const stored = localStorage.getItem('my_projects');
+                if (stored) {
+                    const localProjects = JSON.parse(stored);
+                    const newLocal = localProjects.filter((p: Project) => p.id !== id);
+                    localStorage.setItem('my_projects', JSON.stringify(newLocal));
+                }
+                return updated;
+            });
         }
     };
 
@@ -109,9 +141,10 @@ export default function DashboardPage() {
                             </div>
                             <button
                                 onClick={(e) => { e.stopPropagation(); handleDelete(project.id, project.name); }}
-                                className="text-slate-300 hover:text-red-500 transition-colors p-2"
+                                className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-all"
+                                title="Excluir Projeto"
                             >
-                                <Trash2 size={16} />
+                                <Trash2 size={18} />
                             </button>
                         </div>
 

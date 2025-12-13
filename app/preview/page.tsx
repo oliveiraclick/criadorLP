@@ -1,6 +1,5 @@
 import SmartHero, { getHeroConfig } from "@/components/smart/Hero";
-import SmartFeatures from "@/components/smart/Features";
-import SmartPricing from "@/components/smart/Pricing";
+import PageEditor from "./PageEditor";
 
 type SearchParams = { [key: string]: string | string[] | undefined };
 
@@ -33,66 +32,23 @@ export default function PreviewPage({
 async function Content({ searchParams }: { searchParams: Promise<SearchParams> }) {
     const params = await searchParams;
 
-    const style = params.style as string || 'Corporativo / Confiança';
-    // Backwards compatibility + New Split logic
-    // If URL has specific layout/theme, use them. Else derive from style.
-    const derivedConfig = getHeroConfig(style);
-
-    // Explicit overrides from URL params take precedence
-    const layout = (params.layout as 'centered' | 'full_left' | 'split_right') || derivedConfig.layout;
-    const theme = (params.theme as 'minimal' | 'bold' | 'trust') || derivedConfig.theme;
-
-    const businessName = params.name as string || 'Sua Empresa';
-    const primaryColor = params.color as string || '#2563eb';
-    const tone = params.tone as string || 'Profissional & Sério';
-    const logo = params.logo as string | undefined;
-    const industry = params.industry as string || 'Serviços Gerais';
-
-    // Background Params
-    const bgImage = params.bgImage as string | undefined;
-    const bgOp = params.bgOp ? parseInt(params.bgOp as string) : undefined;
-    const bgColor = params.bgColor as string | undefined;
-    const bgGrad = params.bgGrad as 'none' | 'to_bottom' | 'to_right' | 'radial' | undefined;
+    // Normalize params for the editor
+    const initialConfig = {
+        layout: params.layout as string,
+        theme: params.theme as string,
+        name: params.name as string,
+        color: params.color as string,
+        tone: params.tone as string,
+        logo: params.logo as string,
+        industry: params.industry as string,
+        bgImage: params.bgImage as string,
+        bgOp: params.bgOp as string,
+        bgColor: params.bgColor as string,
+        bgGrad: params.bgGrad as string,
+    };
 
     return (
-        <main>
-            <SmartHero
-                layout={layout}
-                theme={theme}
-                businessName={businessName}
-                primaryColor={primaryColor}
-                tone={tone}
-                logo={logo}
-                backgroundImage={bgImage}
-                overlayOpacity={bgOp}
-                overlayColor={bgColor}
-                overlayGradient={bgGrad}
-            />
-
-            <SmartFeatures
-                layout={layout}
-                theme={theme}
-                industry={industry} // Need to make sure params has industry
-                primaryColor={primaryColor}
-            />
-
-            <SmartPricing
-                layout={layout}
-                theme={theme}
-                businessName={businessName}
-                industry={industry} // Need industry logic again
-                primaryColor={primaryColor}
-            />
-
-            <RegenerationToolbar currentLayout={layout} currentTheme={theme} />
-
-            <RegenerationToolbar currentLayout={layout} currentTheme={theme} />
-
-            {/* Placeholder for other sections */}
-            <div className="py-20 text-center text-neutral-400 border-t border-neutral-100">
-                <p>Outras seções (Features, Depoimentos, etc) seriam geradas aqui...</p>
-            </div>
-        </main>
+        <PageEditor initialParams={initialConfig} />
     );
 }
 
