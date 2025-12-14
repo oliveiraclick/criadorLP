@@ -88,7 +88,7 @@ const SectionWrapper = ({
                     <button
                         type="button"
                         onClick={() => onToggleBgControl(sectionKey)}
-                        className={`absolute top-20 right-4 z-40 bg-white text-slate-700 p-2 px-3 rounded-lg shadow-xl font-bold text-xs flex items-center gap-2 hover:bg-slate-50 transition-all ${activeBgControl === sectionKey ? 'opacity-100 ring-2 ring-blue-500' : 'opacity-0 group-hover:opacity-100'}`}
+                        className={`absolute top-20 right-4 z-40 bg-white text-slate-700 p-2 px-3 rounded-lg shadow-xl font-bold text-xs flex items-center gap-2 hover:bg-slate-50 transition-all ${activeBgControl === sectionKey ? 'opacity-100 ring-2 ring-blue-500' : 'opacity-100 shadow-md border border-slate-100'}`}
                     >
                         🎨 Fundo
                     </button>

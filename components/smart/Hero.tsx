@@ -193,7 +193,7 @@ export default function SmartHero({
         );
     }
 
-    if (layout === 'impact_big_type') {
+    if (layout === 'impact_big_type' || layout === 'impact_full') {
         return (
             <section className={`relative min-h-[800px] flex flex-col items-center justify-center py-20 px-6 text-center overflow-hidden ${!hasCustomBg ? 'bg-black text-white' : ''}`}>
                 <SectionBackground backgroundImage={backgroundImage} backgroundVideo={backgroundVideo} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} overlayTexture={overlayTexture} textureOpacity={textureOpacity} theme={theme} />
