@@ -31,6 +31,7 @@ type PricingProps = {
     onPlanEdit?: (id: string, field: 'name' | 'price' | 'features', value: any, featureIndex?: number) => void;
     // BG Props
     backgroundImage?: string;
+    backgroundVideo?: string; // New
     overlayTexture?: TextureType;
     textureOpacity?: number;
     overlayOpacity?: number;
@@ -42,11 +43,13 @@ export default function SmartPricing({
     layout,
     theme,
     businessName,
+    industry,
     primaryColor,
     content,
     isEditing = false,
     onPlanEdit,
     backgroundImage,
+    backgroundVideo, // New
     overlayTexture,
     textureOpacity,
     overlayOpacity,
@@ -75,101 +78,44 @@ export default function SmartPricing({
         </div>
     );
 
-    // --- LAYOUT: HORIZONTAL LIST ---
-    if (layout === 'list') {
-        return (
-            <section className={containerClass}>
-                <SectionBackground backgroundImage={backgroundImage} overlayTexture={overlayTexture} textureOpacity={textureOpacity} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} theme={theme} />
-                <div className="max-w-5xl mx-auto relative z-10">
-                    <Headline />
-                    <div className="space-y-4">
-                        {content.map((plan) => (
-                            <div key={plan.id} className={`flex flex-col md:flex-row items-center justify-between p-6 rounded-xl ${t.cardBg} ${hasCustomBg && theme !== 'bold' ? 'bg-white/90 backdrop-blur' : ''}`}>
-                                <div className="text-center md:text-left mb-4 md:mb-0">
-                                    <InlineTextEdit value={plan.name} onChange={(val) => onPlanEdit?.(plan.id, 'name', val)} isEditing={isEditing} tagName="h3" className={`text-xl font-bold ${t.title}`} />
-                                    <p className="text-sm opacity-70">Ideal para começar</p>
-                                </div>
-                                <div className="flex gap-4 text-sm opacity-80 mb-4 md:mb-0 flex-wrap justify-center">
-                                    {plan.features.slice(0, 3).map((f, k) => (
-                                        <div key={k} className="flex items-center">
-                                            <span>• </span>
-                                            <InlineTextEdit value={f} onChange={(val) => handleFeatureChange(plan.id, k, val)} isEditing={isEditing} />
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="flex items-center gap-6">
-                                    <InlineTextEdit value={plan.price} onChange={(val) => onPlanEdit?.(plan.id, 'price', val)} isEditing={isEditing} tagName="span" className={`text-2xl font-bold ${t.title}`} />
-                                    <button className="px-6 py-2 rounded-lg font-bold text-white text-sm hover:brightness-110 transition-all" style={{ backgroundColor: primaryColor }}>Escolher</button>
-                                </div>
-                            </div>
+                                        </div >
+                                    ))
+}
+                                </div >
+    <div className="flex items-center gap-6">
+        <InlineTextEdit value={plan.price} onChange={(val) => onPlanEdit?.(plan.id, 'price', val)} isEditing={isEditing} tagName="span" className={`text-2xl font-bold ${t.title}`} />
+        <button className="px-6 py-2 rounded-lg font-bold text-white text-sm hover:brightness-110 transition-all" style={{ backgroundColor: primaryColor }}>Escolher</button>
+    </div>
+                            </div >
                         ))}
-                    </div>
-                </div>
-            </section>
+                    </div >
+                </div >
+            </section >
         );
     }
 
-    // --- LAYOUT: MINIMAL CARDS (No Shadow, Border Only) ---
-    if (layout === 'minimal_cards') {
-        return (
-            <section className={containerClass}>
-                <SectionBackground backgroundImage={backgroundImage} overlayTexture={overlayTexture} textureOpacity={textureOpacity} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} theme={theme} />
-                <div className="max-w-7xl mx-auto relative z-10">
-                    <Headline />
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {content.map((plan) => (
-                            <div key={plan.id} className={`p-8 rounded-xl border-2 transition-all hover:border-blue-500/50 ${hasCustomBg ? 'border-white/20 text-white' : 'border-slate-200'} `} >
-                                <InlineTextEdit value={plan.name} onChange={(val) => onPlanEdit?.(plan.id, 'name', val)} isEditing={isEditing} tagName="h3" className="text-2xl font-bold mb-2" />
-                                <InlineTextEdit value={plan.price} onChange={(val) => onPlanEdit?.(plan.id, 'price', val)} isEditing={isEditing} tagName="div" className="text-4xl font-light mb-8" />
-                                <ul className="space-y-4 mb-8">
-                                    {plan.features.map((feat, j) => (
-                                        <li key={j} className="flex items-center gap-3 text-sm font-medium opacity-80">
-                                            <Check size={16} />
-                                            <InlineTextEdit value={feat} onChange={(val) => handleFeatureChange(plan.id, j, val)} isEditing={isEditing} className="flex-1" />
-                                        </li>
-                                    ))}
-                                </ul>
-                                <button className="w-full py-3 border-2 border-current rounded-lg font-bold hover:bg-white hover:text-black transition-colors">
-                                    Começar
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-        );
-    }
-
-    // --- DEFAULT: CENTERED CARDS ---
+// --- LAYOUT: MINIMAL CARDS (No Shadow, Border Only) ---
+if (layout === 'minimal_cards') {
     return (
         <section className={containerClass}>
             <SectionBackground backgroundImage={backgroundImage} overlayTexture={overlayTexture} textureOpacity={textureOpacity} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} theme={theme} />
             <div className="max-w-7xl mx-auto relative z-10">
                 <Headline />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {content.map((plan) => (
-                        <div key={plan.id} className={`relative p-8 rounded-2xl ${t.cardBg} ${plan.popular ? 'ring-2 ring-offset-2 scale-105 shadow-2xl z-20' : 'shadow-lg'} ${hasCustomBg && theme !== 'bold' ? 'bg-white/95 backdrop-blur' : ''}`} style={{ borderColor: plan.popular ? primaryColor : undefined }}>
-                            {plan.popular && (
-                                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-xs font-bold uppercase tracking-widest text-white px-3 py-1 rounded-full" style={{ backgroundColor: primaryColor }}>
-                                    Mais Popular
-                                </span>
-                            )}
-                            <InlineTextEdit value={plan.name} onChange={(val) => onPlanEdit?.(plan.id, 'name', val)} isEditing={isEditing} tagName="h3" className={`text-xl font-bold mb-2 ${t.title}`} />
-                            <InlineTextEdit value={plan.price} onChange={(val) => onPlanEdit?.(plan.id, 'price', val)} isEditing={isEditing} tagName="div" className={`text-4xl font-extrabold mb-6 ${t.title}`} />
-
+                        <div key={plan.id} className={`p-8 rounded-xl border-2 transition-all hover:border-blue-500/50 ${hasCustomBg ? 'border-white/20 text-white' : 'border-slate-200'} `} >
+                            <InlineTextEdit value={plan.name} onChange={(val) => onPlanEdit?.(plan.id, 'name', val)} isEditing={isEditing} tagName="h3" className="text-2xl font-bold mb-2" />
+                            <InlineTextEdit value={plan.price} onChange={(val) => onPlanEdit?.(plan.id, 'price', val)} isEditing={isEditing} tagName="div" className="text-4xl font-light mb-8" />
                             <ul className="space-y-4 mb-8">
                                 {plan.features.map((feat, j) => (
                                     <li key={j} className="flex items-center gap-3 text-sm font-medium opacity-80">
-                                        <Check size={16} className="text-green-500 shrink-0" />
-                                        <InlineTextEdit value={feat} onChange={(val) => handleFeatureChange(plan.id, j, val)} isEditing={isEditing} className={`flex-1 ${t.title}`} />
+                                        <Check size={16} />
+                                        <InlineTextEdit value={feat} onChange={(val) => handleFeatureChange(plan.id, j, val)} isEditing={isEditing} className="flex-1" />
                                     </li>
                                 ))}
                             </ul>
-                            <button
-                                className={`w-full py-4 rounded-xl font-bold transition-all ${plan.popular ? 'text-white shadow-lg hover:shadow-xl hover:-translate-y-1' : 'bg-slate-100 text-slate-800 hover:bg-slate-200'}`}
-                                style={{ backgroundColor: plan.popular ? primaryColor : undefined }}
-                            >
-                                Escolher {plan.name}
+                            <button className="w-full py-3 border-2 border-current rounded-lg font-bold hover:bg-white hover:text-black transition-colors">
+                                Começar
                             </button>
                         </div>
                     ))}
@@ -177,4 +123,43 @@ export default function SmartPricing({
             </div>
         </section>
     );
+}
+
+// --- DEFAULT: CENTERED CARDS ---
+return (
+    <section className={containerClass}>
+        <SectionBackground backgroundImage={backgroundImage} overlayTexture={overlayTexture} textureOpacity={textureOpacity} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} theme={theme} />
+        <div className="max-w-7xl mx-auto relative z-10">
+            <Headline />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                {content.map((plan) => (
+                    <div key={plan.id} className={`relative p-8 rounded-2xl ${t.cardBg} ${plan.popular ? 'ring-2 ring-offset-2 scale-105 shadow-2xl z-20' : 'shadow-lg'} ${hasCustomBg && theme !== 'bold' ? 'bg-white/95 backdrop-blur' : ''}`} style={{ borderColor: plan.popular ? primaryColor : undefined }}>
+                        {plan.popular && (
+                            <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-xs font-bold uppercase tracking-widest text-white px-3 py-1 rounded-full" style={{ backgroundColor: primaryColor }}>
+                                Mais Popular
+                            </span>
+                        )}
+                        <InlineTextEdit value={plan.name} onChange={(val) => onPlanEdit?.(plan.id, 'name', val)} isEditing={isEditing} tagName="h3" className={`text-xl font-bold mb-2 ${t.title}`} />
+                        <InlineTextEdit value={plan.price} onChange={(val) => onPlanEdit?.(plan.id, 'price', val)} isEditing={isEditing} tagName="div" className={`text-4xl font-extrabold mb-6 ${t.title}`} />
+
+                        <ul className="space-y-4 mb-8">
+                            {plan.features.map((feat, j) => (
+                                <li key={j} className="flex items-center gap-3 text-sm font-medium opacity-80">
+                                    <Check size={16} className="text-green-500 shrink-0" />
+                                    <InlineTextEdit value={feat} onChange={(val) => handleFeatureChange(plan.id, j, val)} isEditing={isEditing} className={`flex-1 ${t.title}`} />
+                                </li>
+                            ))}
+                        </ul>
+                        <button
+                            className={`w-full py-4 rounded-xl font-bold transition-all ${plan.popular ? 'text-white shadow-lg hover:shadow-xl hover:-translate-y-1' : 'bg-slate-100 text-slate-800 hover:bg-slate-200'}`}
+                            style={{ backgroundColor: plan.popular ? primaryColor : undefined }}
+                        >
+                            Escolher {plan.name}
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </section>
+);
 }

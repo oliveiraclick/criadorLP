@@ -30,6 +30,7 @@ type HeroProps = {
 
     // BG Props
     backgroundImage?: string;
+    backgroundVideo?: string; // New
     overlayOpacity?: number;
     overlayColor?: string;
     overlayGradient?: 'none' | 'to_bottom' | 'to_right' | 'radial';
@@ -96,12 +97,13 @@ export default function SmartHero({
     isEditing = false,
     onContentChange,
     backgroundImage,
+    backgroundVideo, // New
     overlayOpacity,
     overlayColor,
     overlayGradient,
     overlayTexture,
     textureOpacity,
-    industry // Add this
+    industry
 }: HeroProps) {
 
     // If no external content state provided, generate defaults on fly (read-only mode essentially)
@@ -174,7 +176,7 @@ export default function SmartHero({
     if (layout === 'classic_card') {
         return (
             <section className={`relative min-h-[700px] flex items-center justify-center py-20 px-6 ${!hasCustomBg ? t.bg : ''}`}>
-                <SectionBackground backgroundImage={backgroundImage} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} overlayTexture={overlayTexture} textureOpacity={textureOpacity} theme={theme} />
+                <SectionBackground backgroundImage={backgroundImage} backgroundVideo={backgroundVideo} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} overlayTexture={overlayTexture} textureOpacity={textureOpacity} theme={theme} />
                 {!hasCustomBg && <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/5 to-transparent"></div>}
 
                 <div className="relative z-10 w-full max-w-6xl">
@@ -194,7 +196,7 @@ export default function SmartHero({
     if (layout === 'impact_big_type') {
         return (
             <section className={`relative min-h-[800px] flex flex-col items-center justify-center py-20 px-6 text-center overflow-hidden ${!hasCustomBg ? 'bg-black text-white' : ''}`}>
-                <SectionBackground backgroundImage={backgroundImage} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} overlayTexture={overlayTexture} textureOpacity={textureOpacity} theme={theme} />
+                <SectionBackground backgroundImage={backgroundImage} backgroundVideo={backgroundVideo} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} overlayTexture={overlayTexture} textureOpacity={textureOpacity} theme={theme} />
 
                 <div className="relative z-10 max-w-5xl">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur mb-10 text-sm font-medium animate-pulse">
@@ -218,7 +220,7 @@ export default function SmartHero({
         const isMinimal = layout === 'minimal_centered';
         return (
             <section className={`${containerClass} justify-center`}>
-                <SectionBackground backgroundImage={backgroundImage} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} overlayTexture={overlayTexture} textureOpacity={textureOpacity} theme={theme} />
+                <SectionBackground backgroundImage={backgroundImage} backgroundVideo={backgroundVideo} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} overlayTexture={overlayTexture} textureOpacity={textureOpacity} theme={theme} />
                 <div className="relative z-10 max-w-4xl mx-auto text-center">
                     {logo && <img src={logo} alt="Logo" className="h-16 mx-auto mb-8 shadow-2xl rounded-full" />}
                     {renderCommonContent()}
@@ -292,7 +294,7 @@ export default function SmartHero({
     const isReverse = layout === 'split_left';
     return (
         <section className={containerClass}>
-            <SectionBackground backgroundImage={backgroundImage} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} overlayTexture={overlayTexture} textureOpacity={textureOpacity} theme={theme} />
+            <SectionBackground backgroundImage={backgroundImage} backgroundVideo={backgroundVideo} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} overlayTexture={overlayTexture} textureOpacity={textureOpacity} theme={theme} />
             <div className="relative z-10 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                 <div className={`order-2 ${isReverse ? 'lg:order-2' : 'lg:order-1'}`}>
                     {logo && <img src={logo} alt="Logo" className="h-10 mb-6 opacity-80" />}

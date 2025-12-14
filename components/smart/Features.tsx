@@ -75,6 +75,7 @@ export default function SmartFeatures({
     isEditing = false,
     onItemEdit,
     backgroundImage,
+    backgroundVideo, // New
     overlayTexture,
     textureOpacity,
     overlayOpacity,
@@ -112,7 +113,7 @@ export default function SmartFeatures({
     if (layout === 'split_right') {
         return (
             <section className={containerClass}>
-                <SectionBackground backgroundImage={backgroundImage} overlayTexture={overlayTexture} textureOpacity={textureOpacity} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} theme={theme} />
+                <SectionBackground backgroundImage={backgroundImage} backgroundVideo={backgroundVideo} overlayTexture={overlayTexture} textureOpacity={textureOpacity} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} theme={theme} />
                 <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12">
                     <div className="md:col-span-1">
                         <div className="sticky top-24">

@@ -37,6 +37,7 @@ type FooterProps = {
     onContentChange?: (field: string, value: any, sectionId?: string, itemIndex?: number) => void;
     // BG Props
     backgroundImage?: string;
+    backgroundVideo?: string; // New
     overlayTexture?: TextureType;
     textureOpacity?: number;
     overlayOpacity?: number;
@@ -54,6 +55,7 @@ export default function SmartFooter({
     isEditing = false,
     onContentChange,
     backgroundImage,
+    backgroundVideo, // New
     overlayTexture,
     textureOpacity,
     overlayOpacity,
@@ -75,7 +77,7 @@ export default function SmartFooter({
     if (layout === 'simple_centered') {
         return (
             <footer className={containerClass}>
-                <SectionBackground backgroundImage={backgroundImage} overlayTexture={overlayTexture} textureOpacity={textureOpacity} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} theme={theme} />
+                <SectionBackground backgroundImage={backgroundImage} backgroundVideo={backgroundVideo} overlayTexture={overlayTexture} textureOpacity={textureOpacity} overlayOpacity={overlayOpacity} overlayColor={overlayColor} overlayGradient={overlayGradient} theme={theme} />
                 <div className="relative z-10 max-w-4xl mx-auto text-center">
                     {logo && <img src={logo} alt="Logo" className="h-8 mx-auto mb-6 opacity-90" />}
                     <div className={`flex justify-center gap-6 mb-8 ${t.title}`}>

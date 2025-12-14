@@ -10,10 +10,12 @@ type SectionBackgroundProps = {
     overlayTexture?: TextureType;
     textureOpacity?: number; // 0-100
     theme?: 'minimal' | 'bold' | 'trust'; // to decide texture color
+    backgroundVideo?: string; // New: Video URL or Blob
 };
 
 export default function SectionBackground({
     backgroundImage,
+    backgroundVideo,
     overlayOpacity = 80,
     overlayColor = '#000000',
     overlayGradient = 'none',
@@ -23,6 +25,7 @@ export default function SectionBackground({
 }: SectionBackgroundProps) {
 
     const hasCustomBg = !!backgroundImage;
+    const hasVideo = !!backgroundVideo;
 
     // 1. BG IMAGE STYLE
     const bgStyle = hasCustomBg ? {
@@ -33,7 +36,7 @@ export default function SectionBackground({
 
     // 2. COLOR OVERLAY STYLE
     const getGradientStyle = () => {
-        if (!hasCustomBg && !backgroundImage) return {};
+        if (!hasCustomBg && !hasVideo && !backgroundImage) return {};
         const opacityHex = Math.round((overlayOpacity / 100) * 255).toString(16).padStart(2, '0');
         const colorWithOp = `${overlayColor}${opacityHex}`;
 
@@ -45,12 +48,12 @@ export default function SectionBackground({
     };
     const overlayStyle = getGradientStyle();
 
-    // 3. TEXTURE OVERLAY STYLE
+    // 3. TEXTURE OVERLAY STYLE (...unchanged...)
     const getTextureStyle = () => {
         if (overlayTexture === 'none') return {};
 
         const opacity = textureOpacity / 100;
-        const color = theme === 'bold' || hasCustomBg ? '255, 255, 255' : '0, 0, 0';
+        const color = theme === 'bold' || hasCustomBg || hasVideo ? '255, 255, 255' : '0, 0, 0';
 
         switch (overlayTexture) {
             case 'dots':
@@ -86,8 +89,18 @@ export default function SectionBackground({
     const textureStyle = getTextureStyle();
 
     return (
-        <div className="absolute inset-0 z-0 pointer-events-none" style={bgStyle}>
-            {hasCustomBg && <div className="absolute inset-0" style={overlayStyle}></div>}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" style={!hasVideo ? bgStyle : {}}>
+            {hasVideo && (
+                <video
+                    src={backgroundVideo}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
+            )}
+            {(hasCustomBg || hasVideo) && <div className="absolute inset-0" style={overlayStyle}></div>}
             {overlayTexture !== 'none' && <div className="absolute inset-0" style={textureStyle}></div>}
         </div>
     );

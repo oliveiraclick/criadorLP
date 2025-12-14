@@ -50,6 +50,7 @@ type EditorProps = {
 type SectionConfig = {
     layout: string;
     bgImage?: string;
+    bgVideo?: string; // New
     overlayTexture: TextureType;
     textureOpacity: number;
     overlayOpacity: number;
@@ -70,6 +71,8 @@ const SectionWrapper = ({
     onToggleBgControl,
     onBgChange,
     onImageUpload,
+    onVideoUpload, // New
+    onVideoLink,   // New
     toolbarOptions
 }: any) => {
     return (
@@ -99,6 +102,11 @@ const SectionWrapper = ({
                                 onOpacityChange={(val: any) => onBgChange(sectionKey, { textureOpacity: val })}
                                 onImageUpload={(f: any) => onImageUpload(f, sectionKey)}
                                 onClearImage={() => onBgChange(sectionKey, { bgImage: undefined })}
+                                // VIDEO PROPS
+                                backgroundVideo={config.bgVideo}
+                                onVideoUpload={(f: any) => onVideoUpload(f, sectionKey)}
+                                onVideoLink={(url: string) => onVideoLink(url, sectionKey)}
+                                onClearVideo={() => onBgChange(sectionKey, { bgVideo: undefined })}
                             />
                         </div>
                     )}
@@ -141,6 +149,7 @@ export default function PageEditor({ initialParams }: EditorProps) {
     const initialSectionConfig: SectionConfig = {
         layout: initialParams.layout || 'split_right',
         bgImage: initialParams.bgImage,
+        bgVideo: undefined, // New
         overlayTexture: 'none',
         textureOpacity: 30,
         overlayOpacity: globalConfig.bgOp,
@@ -303,6 +312,15 @@ export default function PageEditor({ initialParams }: EditorProps) {
         reader.readAsDataURL(file);
     };
 
+    const handleVideoUpload = (file: File, section: string) => {
+        const url = URL.createObjectURL(file);
+        updateSectionConfig(section, { bgVideo: url });
+    };
+
+    const handleVideoLink = (url: string, section: string) => {
+        updateSectionConfig(section, { bgVideo: url });
+    };
+
     const handleHeroContentChange = (field: string, value: string) => setHeroContent(prev => ({ ...prev, [field]: value }));
 
     const handleFeatureEdit = (id: string, field: 'title' | 'desc' | 'icon', newValue?: string) => {
@@ -462,6 +480,7 @@ export default function PageEditor({ initialParams }: EditorProps) {
                 <SectionWrapper
                     sectionKey="hero" title="Hero / Capa" isEditing={isEditing} config={sectionConfigs.hero} activeBgControl={activeBgControl}
                     onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                    onVideoUpload={handleVideoUpload} onVideoLink={handleVideoLink}
                     toolbarOptions={[
                         { id: 'split_right', label: 'Clássico' },
                         { id: 'impact_full', label: 'Impacto' },
@@ -472,7 +491,7 @@ export default function PageEditor({ initialParams }: EditorProps) {
                     <SmartHero
                         layout={sectionConfigs.hero.layout as any} theme={globalConfig.theme as any} businessName={globalConfig.businessName} industry={globalConfig.industry} primaryColor={globalConfig.primaryColor} tone={globalConfig.tone} logo={globalConfig.logo}
                         content={heroContent} isEditing={isEditing} onContentChange={handleHeroContentChange}
-                        backgroundImage={sectionConfigs.hero.bgImage} overlayTexture={sectionConfigs.hero.overlayTexture} textureOpacity={sectionConfigs.hero.textureOpacity} overlayOpacity={sectionConfigs.hero.overlayOpacity} overlayColor={sectionConfigs.hero.overlayColor} overlayGradient={globalConfig.bgGrad as any}
+                        backgroundImage={sectionConfigs.hero.bgImage} backgroundVideo={sectionConfigs.hero.bgVideo} overlayTexture={sectionConfigs.hero.overlayTexture} textureOpacity={sectionConfigs.hero.textureOpacity} overlayOpacity={sectionConfigs.hero.overlayOpacity} overlayColor={sectionConfigs.hero.overlayColor} overlayGradient={globalConfig.bgGrad as any}
                     />
                 </SectionWrapper>
 
@@ -480,11 +499,12 @@ export default function PageEditor({ initialParams }: EditorProps) {
                 <SectionWrapper
                     sectionKey="features" title="Benefícios" isEditing={isEditing} config={sectionConfigs.features} activeBgControl={activeBgControl}
                     onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                    onVideoUpload={handleVideoUpload} onVideoLink={handleVideoLink}
                     toolbarOptions={[{ id: 'centered', label: 'Grid' }, { id: 'split_right', label: 'Lista' }, { id: 'full_left', label: 'Impacto' }]}
                 >
                     <SmartFeatures
                         layout={sectionConfigs.features.layout as any} theme={globalConfig.theme as any} content={featureContent} primaryColor={globalConfig.primaryColor} isEditing={isEditing} onItemEdit={handleFeatureEdit}
-                        backgroundImage={sectionConfigs.features.bgImage} overlayTexture={sectionConfigs.features.overlayTexture} textureOpacity={sectionConfigs.features.textureOpacity} overlayOpacity={sectionConfigs.features.overlayOpacity} overlayColor={sectionConfigs.features.overlayColor} overlayGradient={globalConfig.bgGrad as any}
+                        backgroundImage={sectionConfigs.features.bgImage} backgroundVideo={sectionConfigs.features.bgVideo} overlayTexture={sectionConfigs.features.overlayTexture} textureOpacity={sectionConfigs.features.textureOpacity} overlayOpacity={sectionConfigs.features.overlayOpacity} overlayColor={sectionConfigs.features.overlayColor} overlayGradient={globalConfig.bgGrad as any}
                     />
                 </SectionWrapper>
 
@@ -492,6 +512,7 @@ export default function PageEditor({ initialParams }: EditorProps) {
                 <SectionWrapper
                     sectionKey="testimonials" title="Prova Social" isEditing={isEditing} config={sectionConfigs.testimonials} activeBgControl={activeBgControl}
                     onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                    onVideoUpload={handleVideoUpload} onVideoLink={handleVideoLink}
                     toolbarOptions={[{ id: 'grid', label: 'Grid' }]}
                 >
                     <SmartTestimonials
@@ -506,12 +527,13 @@ export default function PageEditor({ initialParams }: EditorProps) {
                     <SectionWrapper
                         sectionKey="pricing" title="Preços" isEditing={isEditing} config={sectionConfigs.pricing} activeBgControl={activeBgControl}
                         onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                        onVideoUpload={handleVideoUpload} onVideoLink={handleVideoLink}
                         toolbarOptions={[{ id: 'centered', label: 'Cards' }, { id: 'list', label: 'Lista' }, { id: 'minimal_cards', label: 'Minimalista' }]}
                     >
                         <SmartPricing
                             layout={sectionConfigs.pricing.layout as any} theme={globalConfig.theme as any} businessName={globalConfig.businessName} industry={globalConfig.industry} primaryColor={globalConfig.primaryColor}
                             content={pricingContent} isEditing={isEditing} onPlanEdit={handlePricingEdit}
-                            backgroundImage={sectionConfigs.pricing.bgImage} overlayTexture={sectionConfigs.pricing.overlayTexture} textureOpacity={sectionConfigs.pricing.textureOpacity} overlayOpacity={sectionConfigs.pricing.overlayOpacity} overlayColor={sectionConfigs.pricing.overlayColor} overlayGradient={globalConfig.bgGrad as any}
+                            backgroundImage={sectionConfigs.pricing.bgImage} backgroundVideo={sectionConfigs.pricing.bgVideo} overlayTexture={sectionConfigs.pricing.overlayTexture} textureOpacity={sectionConfigs.pricing.textureOpacity} overlayOpacity={sectionConfigs.pricing.overlayOpacity} overlayColor={sectionConfigs.pricing.overlayColor} overlayGradient={globalConfig.bgGrad as any}
                         />
                     </SectionWrapper>
                 )}
@@ -520,6 +542,7 @@ export default function PageEditor({ initialParams }: EditorProps) {
                 <SectionWrapper
                     sectionKey="faq" title="FAQ" isEditing={isEditing} config={sectionConfigs.faq} activeBgControl={activeBgControl}
                     onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                    onVideoUpload={handleVideoUpload} onVideoLink={handleVideoLink}
                     toolbarOptions={[{ id: 'accordion', label: 'Acordeão' }]}
                 >
                     <SmartFAQ
@@ -533,12 +556,13 @@ export default function PageEditor({ initialParams }: EditorProps) {
                 <SectionWrapper
                     sectionKey="footer" title="Rodapé" isEditing={isEditing} config={sectionConfigs.footer} activeBgControl={activeBgControl}
                     onLayoutChange={(k: any, l: any) => updateSectionConfig(k, { layout: l })} onToggleBgControl={(k: any) => setActiveBgControl(activeBgControl === k ? null : k)} onBgChange={handleBgChange} onImageUpload={handleImageUpload}
+                    onVideoUpload={handleVideoUpload} onVideoLink={handleVideoLink}
                     toolbarOptions={[{ id: 'multi_column', label: 'Completo' }, { id: 'simple_centered', label: 'Simples' }, { id: 'newsletter_impact', label: 'Newsletter' }]}
                 >
                     <SmartFooter
                         layout={sectionConfigs.footer.layout as any} theme={globalConfig.theme as any} businessName={globalConfig.businessName} primaryColor={globalConfig.primaryColor} logo={globalConfig.logo}
                         content={footerContent} isEditing={isEditing} onContentChange={handleFooterEdit}
-                        backgroundImage={sectionConfigs.footer.bgImage} overlayTexture={sectionConfigs.footer.overlayTexture} textureOpacity={sectionConfigs.footer.textureOpacity} overlayOpacity={sectionConfigs.footer.overlayOpacity} overlayColor={sectionConfigs.footer.overlayColor} overlayGradient={globalConfig.bgGrad as any}
+                        backgroundImage={sectionConfigs.footer.bgImage} backgroundVideo={sectionConfigs.footer.bgVideo} overlayTexture={sectionConfigs.footer.overlayTexture} textureOpacity={sectionConfigs.footer.textureOpacity} overlayOpacity={sectionConfigs.footer.overlayOpacity} overlayColor={sectionConfigs.footer.overlayColor} overlayGradient={globalConfig.bgGrad as any}
                     />
                 </SectionWrapper>
 
