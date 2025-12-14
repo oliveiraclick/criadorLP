@@ -100,12 +100,13 @@ export default function SmartHero({
     overlayColor,
     overlayGradient,
     overlayTexture,
-    textureOpacity
+    textureOpacity,
+    industry // Add this
 }: HeroProps) {
 
     // If no external content state provided, generate defaults on fly (read-only mode essentially)
     // In PageEditor we will pass the state so it persists.
-    const defaultContent = getHeroContent(tone, businessName, props.industry);
+    const defaultContent = getHeroContent(tone, businessName, industry);
     const content = externalContent || defaultContent;
 
     // ... Themes (unchanged) ...
