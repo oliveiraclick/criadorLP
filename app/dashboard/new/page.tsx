@@ -50,6 +50,7 @@ export default function NewProjectPage() {
             style: formData.style,
             logo: formData.logoUrl,
             industry: formData.industry,
+            type: formData.pageType,
         });
 
         // Pass new fields too if the preview supports them (it might read them from URL or we should save to LS for "current draft")
@@ -107,6 +108,24 @@ export default function NewProjectPage() {
                                                 placeholder="Nome do Projeto ou Empresa"
                                                 autoFocus
                                             />
+                                        </div>
+
+                                        {/* Page Type Selector */}
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {[
+                                                { id: 'sales', label: 'Vendas' },
+                                                { id: 'capture', label: 'Captura' },
+                                                { id: 'bio', label: 'Bio / Link' }
+                                            ].map(type => (
+                                                <button
+                                                    key={type.id}
+                                                    type="button"
+                                                    onClick={() => handleChange('pageType', type.id)}
+                                                    className={`p-3 rounded-xl border transition-all text-sm font-bold ${formData.pageType === type.id ? 'bg-indigo-600/30 border-indigo-500 text-white' : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'}`}
+                                                >
+                                                    {type.label}
+                                                </button>
+                                            ))}
                                         </div>
 
                                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">

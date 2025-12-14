@@ -1,5 +1,5 @@
 import * as LucideIcons from 'lucide-react';
-import { LucideIcon, Settings } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import React from 'react';
 import IconPicker from '../ui/IconPicker';
 import SectionBackground, { TextureType } from './SectionBackground';
