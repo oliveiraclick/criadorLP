@@ -6,13 +6,13 @@ import * as Icons from 'lucide-react';
 // Common icons curation to avoid loading thousands
 const COMMON_ICONS = [
     'Activity', 'Award', 'BarChart', 'Check', 'Clock', 'Cloud', 'Code', 'Coffee', 'Cpu', 'Database',
-    'DollarSign', 'Download', 'Edit', 'Eye', 'File', 'Filter', 'Flag', 'Folder', 'Gift', 'Globe',
+    'DollarSign', 'Download', 'Pencil', 'Eye', 'File', 'Filter', 'Flag', 'Folder', 'Gift', 'Globe',
     'Grid', 'Heart', 'Home', 'Image', 'Inbox', 'Layers', 'Layout', 'LifeBuoy', 'Link', 'List',
     'Lock', 'Mail', 'Map', 'MessageCircle', 'Mic', 'Monitor', 'Moon', 'Music', 'Navigation', 'Package',
     'Paperclip', 'Phone', 'PieChart', 'Play', 'Plus', 'Power', 'Printer', 'Radio', 'RefreshCcw', 'Save',
     'Search', 'Send', 'Server', 'Settings', 'Share', 'Shield', 'ShoppingBag', 'ShoppingCart', 'Smartphone', 'Smile',
     'Speaker', 'Star', 'Sun', 'Tablet', 'Tag', 'Target', 'Terminal', 'Thermometer', 'ThumbsUp', 'Tool',
-    'Trash', 'TrendingUp', 'Truck', 'Tv', 'Umbrella', 'Unlock', 'Upload', 'User', 'Users', 'Video',
+    'Trash2', 'TrendingUp', 'Truck', 'Tv', 'Umbrella', 'Unlock', 'Upload', 'User', 'Users', 'Video',
     'Voicemail', 'Volume2', 'Watch', 'Wifi', 'Zap', 'ZoomIn'
 ];
 
@@ -56,6 +56,7 @@ export default function IconPicker({ currentIcon, onSelect, onClose }: IconPicke
                 <div className="flex-1 overflow-y-auto p-4 grid grid-cols-5 gap-3">
                     {filteredIcons.map(name => {
                         const Icon = (Icons as any)[name];
+                        if (!Icon) return null;
                         return (
                             <button
                                 key={name}

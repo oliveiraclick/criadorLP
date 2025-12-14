@@ -93,14 +93,7 @@ export default function SmartFeatures({
 
     // Helper functions
     const renderIcon = (name: string, id: string) => {
-        let Icon = Settings;
-        try {
-            if (LucideIcons && (LucideIcons as any)[name]) {
-                Icon = (LucideIcons as any)[name];
-            }
-        } catch (e) {
-            console.warn(`Icon ${name} not found`);
-        }
+        const Icon = (LucideIcons as any)[name] || Settings;
         return (
             <EditWrapper isEditing={isEditing} onClick={() => onItemEdit?.(id, 'icon')} className={`w-12 h-12 rounded-lg ${t.iconBg} flex items-center justify-center mb-4 text-blue-600`}>
                 <Icon size={24} style={{ color: primaryColor }} />

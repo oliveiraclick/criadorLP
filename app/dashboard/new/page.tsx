@@ -14,7 +14,7 @@ export default function NewProjectPage() {
     const [formData, setFormData] = useState({
         businessName: '',
         industry: '',
-        pageType: 'sales', // sales, institutional, capture, bio
+        pageType: 'sales',
         style: '',
         logoUrl: '',
         briefing: '',
@@ -50,7 +50,6 @@ export default function NewProjectPage() {
             style: formData.style,
             logo: formData.logoUrl,
             industry: formData.industry,
-            type: formData.pageType,
         });
 
         // Pass new fields too if the preview supports them (it might read them from URL or we should save to LS for "current draft")
@@ -70,7 +69,7 @@ export default function NewProjectPage() {
                     <div className="h-1.5 w-full bg-white/5">
                         <div
                             className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-700 ease-out shadow-[0_0_15px_rgba(6,182,212,0.5)]"
-                            style={{ width: `${(step / 5) * 100}%` }}
+                            style={{ width: `${(step / 4) * 100}%` }}
                         ></div>
                     </div>
 
@@ -81,7 +80,7 @@ export default function NewProjectPage() {
                             Cancelar
                         </Link>
                         <div className="text-sm font-bold text-blue-200">
-                            PASSO {step} DE 5
+                            PASSO {step} DE 4
                         </div>
                     </div>
 
@@ -94,36 +93,7 @@ export default function NewProjectPage() {
                             {step === 1 && (
                                 <div className="space-y-8 animate-fade-in">
                                     <div className="text-center mb-8">
-                                        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200 mb-2">Qual o objetivo?</h2>
-                                        <p className="text-slate-400">Escolha o tipo de página que deseja criar.</p>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {[
-                                            { id: 'sales', label: 'Página de Vendas', desc: 'Focada em conversão e venda de produtos.' },
-                                            { id: 'institutional', label: 'Institucional / Branding', desc: 'Apresente sua empresa e serviços.' },
-                                            { id: 'capture', label: 'Captura de Leads', desc: 'Ideal para ebooks, webinars e iscas.' },
-                                            { id: 'bio', label: 'Bio / Linktree', desc: 'Agregador de links para redes sociais.' }
-                                        ].map((type) => (
-                                            <button
-                                                key={type.id}
-                                                type="button"
-                                                onClick={() => handleChange('pageType', type.id)}
-                                                className={`p-6 rounded-2xl border text-left transition-all ${formData.pageType === type.id ? 'bg-blue-600/20 border-blue-500 shadow-glow' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
-                                            >
-                                                <div className={`text-lg font-bold mb-1 ${formData.pageType === type.id ? 'text-white' : 'text-slate-300'}`}>{type.label}</div>
-                                                <div className="text-sm text-slate-500">{type.desc}</div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* STEP 2: BASICS (Was 1) */}
-                            {step === 2 && (
-                                <div className="space-y-8 animate-fade-in">
-                                    <div className="text-center mb-8">
-                                        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200 mb-2">Detalhes do Projeto</h2>
+                                        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200 mb-2">Vamos começar</h2>
                                         <p className="text-slate-400">Dê um nome e categoria para o seu projeto.</p>
                                     </div>
 
@@ -162,8 +132,8 @@ export default function NewProjectPage() {
                                 </div>
                             )}
 
-                            {/* STEP 3: BRIEFING (Was 2) */}
-                            {step === 3 && (
+                            {/* STEP 2: BRIEFING */}
+                            {step === 2 && (
                                 <div className="space-y-6 animate-fade-in">
                                     <div className="text-center mb-6">
                                         <h2 className="text-3xl font-bold text-white mb-2">Detalhes Importantes</h2>
@@ -196,8 +166,8 @@ export default function NewProjectPage() {
                                 </div>
                             )}
 
-                            {/* STEP 4: VISUAL (Was 3) */}
-                            {step === 4 && (
+                            {/* STEP 3: VISUAL */}
+                            {step === 3 && (
                                 <div className="space-y-8 animate-fade-in">
                                     <div className="text-center mb-6">
                                         <h2 className="text-3xl font-bold text-white mb-2">Identidade Visual</h2>
@@ -231,8 +201,8 @@ export default function NewProjectPage() {
                                 </div>
                             )}
 
-                            {/* STEP 5: REVIEW (Was 4) */}
-                            {step === 5 && (
+                            {/* STEP 4: REVIEW */}
+                            {step === 4 && (
                                 <div className="space-y-8 animate-fade-in text-center">
                                     <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 mx-auto flex items-center justify-center shadow-[0_0_50px_rgba(6,182,212,0.5)] mb-6 animate-pulse-slow">
                                         <Sparkles size={40} className="text-white" />
@@ -270,7 +240,7 @@ export default function NewProjectPage() {
 
                                 <button
                                     type="button"
-                                    onClick={step === 5 ? handleSubmit : () => setStep(s => s + 1)}
+                                    onClick={step === 4 ? handleSubmit : () => setStep(s => s + 1)}
                                     disabled={loading}
                                     className="flex-1 btn-primary-glow py-4 rounded-full text-lg shadow-lg flex items-center justify-center gap-2 group"
                                 >
@@ -278,7 +248,7 @@ export default function NewProjectPage() {
                                         <span className="animate-pulse">Criando Mágica...</span>
                                     ) : (
                                         <>
-                                            {step === 5 ? 'Gerar Landing Page' : 'Continuar'}
+                                            {step === 4 ? 'Gerar Landing Page' : 'Continuar'}
                                             <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                         </>
                                     )}
@@ -289,7 +259,7 @@ export default function NewProjectPage() {
                     </div>
 
                 </div>
-            </div >
-        </PremiumBackground >
+            </div>
+        </PremiumBackground>
     );
 }

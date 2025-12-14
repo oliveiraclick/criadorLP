@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import InlineTextEdit from '@/components/ui/InlineTextEdit';
 import SectionBackground from './SectionBackground';
 
