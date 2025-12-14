@@ -94,7 +94,7 @@ export default function NewProjectPage() {
                             {step === 1 && (
                                 <div className="space-y-8 animate-fade-in">
                                     <div className="text-center mb-8">
-                                        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200 mb-2">Vamos começar</h2>
+                                        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200 mb-2">Criar Novo Projeto</h2>
                                         <p className="text-slate-400">Dê um nome e categoria para o seu projeto.</p>
                                     </div>
 
@@ -121,7 +121,7 @@ export default function NewProjectPage() {
                                                     key={type.id}
                                                     type="button"
                                                     onClick={() => handleChange('pageType', type.id)}
-                                                    className={`p-3 rounded-xl border transition-all text-sm font-bold ${formData.pageType === type.id ? 'bg-indigo-600/30 border-indigo-500 text-white' : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'}`}
+                                                    className={`p-3 rounded-xl border transition-all text-sm font-bold ${formData.pageType === type.id ? 'bg-indigo-600/30 border-indigo-500 text-white' : 'bg-white/10 border-white/5 text-slate-300 hover:bg-white/20'}`}
                                                 >
                                                     {type.label}
                                                 </button>
