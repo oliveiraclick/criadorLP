@@ -114,8 +114,11 @@ export default function NewProjectPage() {
                                         <div className="grid grid-cols-3 gap-3">
                                             {[
                                                 { id: 'sales', label: 'Vendas' },
-                                                { id: 'capture', label: 'Captura' },
-                                                { id: 'bio', label: 'Bio / Link' }
+                                                { id: 'capture', label: 'Captura (Leads)' },
+                                                { id: 'launch', label: 'Lançamento' },
+                                                { id: 'branding', label: 'Institucional' },
+                                                { id: 'event', label: 'Evento / Webinar' },
+                                                { id: 'bio', label: 'Bio Link' }
                                             ].map(type => (
                                                 <button
                                                     key={type.id}
